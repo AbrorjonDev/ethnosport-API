@@ -26,14 +26,17 @@ from rest_framework_simplejwt.views import (
 )
 
 
+#documenting API
+from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
+    path(r'', include_docs_urls(title='Ethnosport API Docs')),
     path('admin/', admin.site.urls),
     path('api/', include('app.urls')),
     # path('auth/', include('dj_rest_auth.urls')),
     # path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 
