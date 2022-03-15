@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -13,7 +14,7 @@ class RegionsViewSet(ModelViewSet):
     queryset = RegionModel.objects.all()
     serializer_class = RegionSerializer
     list_serializer_class = RegionListSerializer
-
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         return RegionModel.objects.all()
@@ -82,6 +83,8 @@ class CategoryViewSet(ModelViewSet):
 class SportsmenViewSet(ModelViewSet):
     queryset = Sportsmen.objects.all()
     serializer_class = SportsmenSerializer
+    # pagination_class = LimitOffsetPagination
+    # page_size=100
 
     def get_queryset(self, region=None, sport=None, category=None):
         if category:
@@ -143,9 +146,10 @@ class SportsmenImagesViewSet(ModelViewSet):
 
     def list(self, request):
         queryset = SportsmenImages.objects.all()
-        serializer = self.get_serializer(queryset, many=True, context={'request':request})
-        return Response(serializer.data, status=200)
-
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True, context={'request':request})
+        # return Response(serializer.data, status=200)
+        return self.get_paginated_response(serializer.data)
 
 
 
@@ -206,7 +210,29 @@ class CompetitionImagesViewSet(ModelViewSet):
     queryset = CompetitionImages.objects.all()
     serializer_class = CISerializer #CompetitionImagesListSerializer
 
-    def list(self, request):
-        qs = CompetitionImages.objects.all()
-        serializer = CISerializer(qs, many=True, context={'request':request})
-        return Response(serializer.data, status=200)
+
+class CommentsINCompetitionsViewSet(ModelViewSet):
+    queryset = CommentsINCompetitions.objects.all()
+    serializer_class = CommentsINCompetitionsSerializer
+
+    
+
+class VideosViewSet(ModelViewSet):
+    queryset = Videos.objects.all()
+    serializer_class=VideosSerializer
+
+
+class FotosViewSet(ModelViewSet):
+    queryset = Fotos.objects.all()
+    serializer_class=FotosSerializer
+
+
+class CategoryDocsViewSet(ModelViewSet):
+    queryset = CategoryDocs.objects.all()
+    serializer_class = CategoryDocsSerializer
+
+class DocsViewSet(ModelViewSet):
+    queryset = Docs.objects.all()
+    serializer_class = DocsSerializer
+
+    

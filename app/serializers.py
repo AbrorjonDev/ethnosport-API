@@ -89,7 +89,7 @@ class SportsListSerializer(serializers.HyperlinkedModelSerializer, serializers.M
     sport_images = SportImagesSerializer(required=False, many=True)
     class Meta:
         model = Sports
-        fields = ['url','name',  'slug', 'date_created', 'date_updated', 'sport_images']
+        fields = ['url','id', 'name',  'slug', 'date_created', 'date_updated', 'sport_images']
         extra_kwargs = {
             'url':{'view_name':'app:sports-detail', 'lookup_field':'pk'}, 
             'date_created':{'read_only':True},
@@ -127,7 +127,7 @@ class SportsmenSerializer(serializers.ModelSerializer):
 
 class SportsmenListSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
     category = CategorySerializer(required=False, many=True)
-    sport = SportsSerializer(required=False)
+    sport = SportsSerializer(required=False, many=False)
     region = RegionForOtherSerializer(required=False)
 
     class Meta:
@@ -136,6 +136,7 @@ class SportsmenListSerializer(serializers.HyperlinkedModelSerializer, serializer
         extra_kwargs = {
             'url':{'view_name':'app:sportsmen-detail', 'lookup_field':'pk'}, 
             'id':{'read_only':True},
+            'main_sportman_image':{'read_only':True}
             }
         depth = 1
 
@@ -159,24 +160,16 @@ class SportsmenImagesSerializer(serializers.HyperlinkedModelSerializer, serializ
         # }
 
 
-class EventsListSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
+class EventsListSerializer(serializers.HyperlinkedModelSerializer):
     
     region = RegionForOtherSerializer(required=False)
     class Meta:
         model = Events
         fields = (
-            'url', 
-            'id',
-            'text', 
-            'videos', 
-            'seen',
-            'rate'
-            'region',
-            'date_occured',
-            'date_created',
-            'date_updated'
+            'url', 'id','text','videos','seen', 'rate','region', 'date_occured', 'date_created','date_updated'
             )
         extra_kwargs = {
+            'url':{'view_name':'app:events-detail', 'lookup_field':'pk'},
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},
         }
@@ -195,17 +188,17 @@ class EventsSerializer(serializers.HyperlinkedModelSerializer, serializers.Model
 class CISerializer(serializers.ModelSerializer):
     class Meta:
         model = CompetitionImages
-        fields = ('url', 'pk', 'image', 'competition')
+        fields = ('pk', 'image', 'competition')
 
-# class CompetitionImagesListSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
+class CompetitionImagesListSerializer(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = CompetitionImages
-#         fields = ('url', 'pk', 'image', 'competition')
+    class Meta:
+        model = CompetitionImages
+        fields = ('pk', 'image')
 
-#         extra_kwargs = {
-#             'url':{'view_name':'apps:competitionimages-detail', 'lookup_field':'pk', 'read_only':True}
-#         }
+        # extra_kwargs = {
+        #     'url':{'view_name':'apps:competitionimages-detail', 'lookup_field':'pk'}
+        # }
 
 
 
@@ -223,14 +216,80 @@ class CompetitionsListSerializer(serializers.HyperlinkedModelSerializer, seriali
         depth=1
 
 
+
+class CommentsINCompetitionsListSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = CommentsINCompetitions
+        fields = ('url', 'pk', 'comment', 'name', 'rate')
+
+        extra_kwargs = {
+            'url':{'view_name':'app:commentsincompetitions-detail', 'lookup_field':'pk'},
+            
+        }
+
+
+
 class CompetitionsSerializer(serializers.ModelSerializer):
-    # competition_images = CompetitionImagesListSerializer(required=False, many=True)
-    # sports = serializers.HyperlinkedRelatedField(view_name='app:sports-detail', lookup_field='pk', required=False, read_only=True)
-    # sports = SportsSerializer(required=False)
+    competition_images = CompetitionImagesListSerializer(many=True, required=False)
+    sports = SportsSerializer(many=True)
+    get_comments = CommentsINCompetitionsListSerializer(many=True)
+
     class Meta:
         model = Competitions
-        fields = ('id', 'name', 'sports', 'pdf', 'competition_images')
+        fields = ('id', 'name', 'sports', 'pdf', 'competition_images', 'get_comments')
         
+    extra_kwargs = {
+        'competition_images':{'read_only':True},
+        'images':{'write_only':True},
+    }
+
+class CommentsINCompetitionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentsINCompetitions
+        fields = ('pk', 'comment', 'name', 'competition', 'rate')
+
         extra_kwargs = {
-            'competition_images':{'read_only':True}
+            'pk':{'read_only':True},            
         }
+
+
+class VideosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Videos
+        fields = "__all__"
+
+
+
+class FotosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fotos
+        fields = "__all__"
+
+class DocsSerializer(serializers.HyperlinkedModelSerializer):
+    # category = CategoryDocsSerializer(many=True, required=False)
+
+    class Meta:
+        model = Docs
+        fields = ('pk', 'url', 'name', 'category', 'doc', 'doc_url')
+
+        extra_kwargs = {
+            'view_name':'app:docs-detail',
+            'lookup_field':'pk',
+            'read_only':True
+        }
+
+
+
+class CategoryDocsSerializer(serializers.HyperlinkedModelSerializer):
+    get_docs = DocsSerializer(many=True, required=False)
+    url = serializers.HyperlinkedIdentityField(view_name='app:categorydocs-detail', lookup_field='pk', source=CategoryDocs)
+    class Meta:
+        model = CategoryDocs
+        fields = ('pk', 'url', 'name', 'get_docs')
+
+        extra_kwargs = {
+            'view_name':'app:categorydocs-detail',
+            'lookup_field':'pk',
+        }
+
