@@ -146,10 +146,10 @@ class SportsmenImagesViewSet(ModelViewSet):
 
     def list(self, request):
         queryset = SportsmenImages.objects.all()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True, context={'request':request})
-        # return Response(serializer.data, status=200)
-        return self.get_paginated_response(serializer.data)
+        # page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True, context={'request':request})
+        return Response(serializer.data, status=200)
+        # return self.get_paginated_response(serializer.data)
 
 
 
