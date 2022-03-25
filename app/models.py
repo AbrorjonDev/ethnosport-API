@@ -77,7 +77,8 @@ class SportImages(models.Model):
 class Category(models.Model):
 
     name = models.CharField(max_length=200, verbose_name='Sportsman\'s category')
-
+    def __str__(self):
+        return self.name
 
 class Sportsmen(models.Model):
 
@@ -86,7 +87,7 @@ class Sportsmen(models.Model):
     achievements = ArrayField(
         models.TextField(), size=100, null=True, blank=True
     )
-    category = models.ManyToManyField(Category, default=None, related_name='category')
+    category = models.ManyToManyField(Category, null=True, blank=True, default=None, related_name='category')
     sport = models.ForeignKey(Sports, on_delete=models.SET_NULL, null=True, blank=True, related_name='sport')
     region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='region')
 
@@ -128,7 +129,7 @@ class Events(models.Model):
     date_occured = models.DateField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-
+    visited = models.IntegerField(default=0, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -186,7 +187,8 @@ class CommentsINCompetitions(models.Model):
 class Videos(models.Model):
     name = models.CharField(max_length=1000, null=True, blank=True)
     video = models.FileField(upload_to='videos')
-
+    def __str__(self):
+        return self.name
 
     def save(self, *args,**kwargs):
         
@@ -198,6 +200,9 @@ class Fotos(models.Model):
     name = models.CharField(max_length=1000, null=True, blank=True)
     foto = models.FileField(upload_to='foros')
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args,**kwargs):
         if not self.name:
             self.name = self.video.name
@@ -206,6 +211,9 @@ class Fotos(models.Model):
 
 class CategoryDocs(models.Model):
     name = models.CharField(max_length=2000)
+
+    def __str__(self):
+        return self.name
 
     def __str__(self):
         return self.name
@@ -227,7 +235,8 @@ class Docs(models.Model):
             self.name = self.doc.name
         return super(Docs, self).save(*args, **kwargs)
 
-
+    def __str__(self):
+        return self.name
 
 
 

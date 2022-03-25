@@ -166,15 +166,16 @@ class EventsListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Events
         fields = (
-            'url', 'id','text','videos','seen', 'rate','region', 'date_occured', 'date_created','date_updated'
+            'url', 'id','text','videos','seen', 'rate','visited', 'region', 'date_occured', 'date_created','date_updated'
             )
         extra_kwargs = {
             'url':{'view_name':'app:events-detail', 'lookup_field':'pk'},
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},
+            'visited':{'read_only':True},
         }
 
-class EventsSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
+class EventsSerializer(serializers.ModelSerializer):
     
     # region = RegionForOtherSerializer(required=False)
     class Meta:
@@ -183,6 +184,7 @@ class EventsSerializer(serializers.HyperlinkedModelSerializer, serializers.Model
         extra_kwargs = {
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},
+            'visited':{'read_only':True},
         }
 
 class CISerializer(serializers.ModelSerializer):
@@ -266,30 +268,30 @@ class FotosSerializer(serializers.ModelSerializer):
         model = Fotos
         fields = "__all__"
 
-class DocsSerializer(serializers.HyperlinkedModelSerializer):
+class DocsSerializer(serializers.ModelSerializer):
     # category = CategoryDocsSerializer(many=True, required=False)
 
     class Meta:
         model = Docs
-        fields = ('pk', 'url', 'name', 'category', 'doc', 'doc_url')
+        fields = ('pk', 'name', 'category', 'doc', 'doc_url')
 
-        extra_kwargs = {
-            'view_name':'app:docs-detail',
-            'lookup_field':'pk',
-            'read_only':True
-        }
+#        extra_kwargs = {
+#            'url':{'view_name':'app:docs-detail',
+#            'lookup_field':'pk',
+ #           'read_only':True},
+  #      }
 
 
 
-class CategoryDocsSerializer(serializers.HyperlinkedModelSerializer):
+class CategoryDocsSerializer(serializers.ModelSerializer):
     get_docs = DocsSerializer(many=True, required=False)
-    url = serializers.HyperlinkedIdentityField(view_name='app:categorydocs-detail', lookup_field='pk', source=CategoryDocs)
+    #url = serializers.HyperlinkedIdentityField(view_name='app:categorydocs-detail', lookup_field='pk', source=CategoryDocs)
     class Meta:
         model = CategoryDocs
-        fields = ('pk', 'url', 'name', 'get_docs')
+        fields = ('pk', 'name', 'get_docs')
 
-        extra_kwargs = {
-            'view_name':'app:categorydocs-detail',
-            'lookup_field':'pk',
-        }
+#        extra_kwargs = {
+#            'url':{'view_name':'app:categorydocs-detail',
+#            'lookup_field':'pk'},
+#        }
 
