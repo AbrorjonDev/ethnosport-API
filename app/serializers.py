@@ -203,14 +203,19 @@ class SportsmenImagesSerializer(serializers.HyperlinkedModelSerializer, serializ
         #     'url':{'view_name':'app:sportsmenimages-detail', 'lookup_field':'pk', 'read_only':True},
         # }
 
+class EventsForOtherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventsImages
+        fields = ('pk', 'image')
+
 
 class EventsListSerializer(serializers.HyperlinkedModelSerializer):
-    
+    get_images = EventsForOtherSerializer(required=False, many=True, read_only=True)
     region = RegionForOtherSerializer(required=False)
     class Meta:
         model = Events
         fields = (
-            'url', 'id','text','videos','seen', 'rate','visited', 'region', 'date_occured', 'date_created','date_updated'
+            'url', 'id','text','videos','get_images', 'seen', 'rate','visited', 'region', 'date_occured', 'date_created','date_updated'
             )
         extra_kwargs = {
             'url':{'view_name':'app:events-detail', 'lookup_field':'pk'},
@@ -220,10 +225,12 @@ class EventsListSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 class EventsSerializer(serializers.ModelSerializer):
+    get_images = EventsForOtherSerializer(required=False, many=True, read_only=True)
+    images = serializers.ImageField(required=False, write_only=True)
     # region = RegionForOtherSerializer(required=False)
     class Meta:
         model = Events
-        fields = "__all__"
+        fields = ('pk','text','videos','get_images', 'seen', 'rate','visited', 'region', 'date_occured', 'date_created','date_updated', 'images')
         extra_kwargs = {
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},

@@ -169,7 +169,24 @@ class EventsViewSet(ModelViewSet):
         return Response(serializer.data, status=200)
     
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            text, videos = data['text'], data['videos']
+            seen, rate = data['seen'], data['rate']
+            region = data['region']
+            events_obj = Events.objects.create(
+                text=text, videos=videos, seen=seen,
+                rate=rate, region=region
+                )
+            events_obj.save()
+
+            images = request.FILES.getlist('images')
+            for img in images:
+                EventsImages.objects.create(event=events_obj, image=img)
+            # data = SportsmenSerializer(sportsman_obj, many=False).data
+            return Response({'status':'created'}, status=200)
+        return Response(serializer.errors, status=400)
 
     def retrieve(self, request, *args, **kwargs):
         obj = self.get_object()
