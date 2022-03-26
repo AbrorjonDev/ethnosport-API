@@ -49,11 +49,12 @@ class RegionModel(models.Model):
         rates = [event.rate for event in self.events.all()]
         for rate in rates:
             ball += rate
-        print("Ball: ", ball)
-        print( "max ball: ", float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20))))
+ #       print("Ball: ", ball)
+#        print( "max ball: ", float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20))))
         # return  ball
-        return round(ball/float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20)))*100, 2)
-
+        if self.get_events_count:
+            return round(ball/float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20)))*100, 2)
+        return 0
     class Meta:
         verbose_name = _('Region')
         verbose_name_plural = _('Regions')
