@@ -85,8 +85,14 @@ admin.site.register(Category)
 
 admin.site.register(SportsmenImages)
 
+class Event_ImagesInline(admin.StackedInline):
+    model = EventsImages
+    classes = ('collapse', )
 
-admin.site.register(Events)
+class EventsAdmin(admin.ModelAdmin):
+    fields = ('name', 'text', 'videos', 'seen', 'rate', 'region', 'visited')
+    inlines = [Event_ImagesInline]
+admin.site.register(Events, EventsAdmin)
 
 class CompetitionImagesINline(admin.StackedInline):
     model = CompetitionImages

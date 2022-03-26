@@ -160,6 +160,11 @@ class Events(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     visited = models.IntegerField(default=0, null=True, blank=True)
 
+
+    @property
+    def get_images(self):
+        return self.images.all()
+
     def __str__(self):
         return self.name
 
@@ -168,6 +173,14 @@ class Events(models.Model):
         verbose_name_plural = _('Events')
 
         ordering = ( 'date_created', 'date_updated',)
+
+
+class EventsImages(models.Model):
+    event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='eventsimages')
+
+    def __str__(self):
+        return '{0} for {1}'.format(self.image.name, self.event.name)
 
 
 class Competitions(models.Model):
