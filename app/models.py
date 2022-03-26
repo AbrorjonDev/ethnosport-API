@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from decouple import config
 
 User = get_user_model()
 
@@ -26,6 +27,32 @@ class RegionModel(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    @property
+    def get_sportsmen(self):
+        return self.sportsmen.all()
+
+    @property
+    def get_sportsmen_count(self):
+        return self.sportsmen.all().count()
+
+    @property
+    def get_events(self):
+        return self.events.all()
+    
+    @property
+    def get_events_count(self):
+        return self.events.all().count()
+
+    @property
+    def statistics(self):
+        ball=0
+        rates = [event.rate for event in self.events.all()]
+        for rate in rates:
+            ball += rate
+        print("Ball: ", ball)
+        print( "max ball: ", float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20))))
+        # return  ball
+        return round(ball/float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20)))*100, 2)
 
     class Meta:
         verbose_name = _('Region')
@@ -48,7 +75,7 @@ class RegionModel(models.Model):
 class Sports(models.Model):
 
     name = models.CharField(max_length=200, verbose_name='Sport name')
-    slug = models.SlugField()
+    slug = models.SlugField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -89,7 +116,7 @@ class Sportsmen(models.Model):
     )
     category = models.ManyToManyField(Category, null=True, blank=True, default=None, related_name='category')
     sport = models.ForeignKey(Sports, on_delete=models.SET_NULL, null=True, blank=True, related_name='sport')
-    region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='region')
+    region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='sportsmen')
 
     class Meta:
         verbose_name = _('Sportsman')
@@ -125,7 +152,8 @@ class Events(models.Model):
     )
     seen = models.BooleanField(default=False)
     rate = models.FloatField(default=0.0)
-    region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True)
+    region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True, 
+        related_name='events')
     date_occured = models.DateField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)

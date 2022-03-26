@@ -1,16 +1,13 @@
+from email.policy import default
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 
 
-
 User = get_user_model()
 
-
 from .models import *
-
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,30 +17,68 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("username", "email", "first_name", "last_name")
 
 
+class SportsmenForOthersSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Sportsmen
+        fields = ('url', 'pk', 'name')
+        extra_kwargs = {
+            'url':{'view_name':'app:sportsmen-detail', 'lookup_field':'pk'},
+        }
+
+
+class EventsForOthersSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Events
+        fields = ('url', 'pk', 'name')
+        extra_kwargs = {
+            'url':{'view_name':'app:events-detail', 'lookup_field':'pk'},
+        }
+
 class RegionListSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
     admin = UserSerializer(required=False)
+    get_sportsmen = SportsmenForOthersSerializer(many=True, required=False)
+    get_events = SportsmenForOthersSerializer(many=True, required=False)
+    statistics = serializers.FloatField(required=False)
+    get_sportsmen_count = serializers.IntegerField(required=False)
+    get_events_count = serializers.IntegerField(required=False)
+
     class Meta:
         model = RegionModel
-        fields = ['url', 'id', 'name', 'email', 'admin', 'phone','boss', 'address', 'd', 'reg_id', 'date_created', 'date_updated']
+        fields = ['url', 'id', 'name', 'email', 'admin', 'phone','boss', 'address', 'd', 'reg_id', 'date_created', 'date_updated', 'get_sportsmen', 'get_events', 'statistics', 'get_sportsmen_count', 'get_events_count']
         extra_kwargs = {
             'url':{'view_name':'app:regionmodel-detail', 'lookup_field':'pk'}, 
             'd':{'read_only':True},
             'reg_id':{'read_only':True},
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},
+            'get_sportsmen':{'read_only':True},
+            'get_events':{'read_only':True},
+            'get_sportsmen_count':{'read_only':True},
+            'get_events_count':{'read_only':True},
+            'statistics':{'read_only':True},
         }
 
 
 class RegionSerializer(serializers.ModelSerializer):
+    get_sportsmen = SportsmenForOthersSerializer(many=True, required=False)
+    get_events = SportsmenForOthersSerializer(many=True, required=False)
+    statistics = serializers.FloatField(required=False)
+    get_sportsmen_count = serializers.IntegerField(required=False)
+    get_events_count = serializers.IntegerField(required=False)
     class Meta:
         model = RegionModel
-        fields = ['id', 'name', 'email', 'admin', 'phone','boss', 'address', 'd', 'reg_id', 'date_created', 'date_updated']
+        fields = ['id', 'name', 'email', 'admin', 'phone','boss', 'address', 'd', 'reg_id', 'date_created', 'date_updated', 'get_sportsmen', 'get_events', 'statistics', 'get_sportsmen_count', 'get_events_count']
         extra_kwargs = {
             # 'url':{'view_name':'app:regionmodel-detail', 'lookup_field':'pk'}, 
             'd':{'read_only':True},
             'reg_id':{'read_only':True},
             'date_created':{'read_only':True},
             'date_updated':{'read_only':True},
+            'get_sportsmen':{'read_only':True},
+            'get_events':{'read_only':True},
+            'get_sportsmen_count':{'read_only':True},
+            'get_events_count':{'read_only':True},
+            'statistics':{'read_only':True},
         }
 
 class RegionForOtherSerializer(serializers.HyperlinkedModelSerializer, serializers.ModelSerializer):
@@ -176,7 +211,6 @@ class EventsListSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 class EventsSerializer(serializers.ModelSerializer):
-    
     # region = RegionForOtherSerializer(required=False)
     class Meta:
         model = Events

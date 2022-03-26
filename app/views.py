@@ -168,6 +168,36 @@ class EventsViewSet(ModelViewSet):
         serializer = EventsListSerializer(queryset, many=True, context={'request':request})
         return Response(serializer.data, status=200)
     
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.visited += 1
+        obj.save() 
+        return super().retrieve(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+
+    # def retrieve(self, request, *args, **kwargs):
+    #     print("retrieve working..")
+    #     obj = self.get_object()
+    #     serializer = self.serializer_class(obj, data=request.data, partial=True)
+    #     if serializer.is_valid(raise_exception=True):
+    #         if serializer.validated_data.get('read'):
+    #             print(serializer.validated_data.get('read'))
+    #             obj.visited += 1
+    #             obj.save()
+    #         serializer.save()
+    #         print("properly working..")
+    #         return Response(serializer.data, status=200)
+    #     return Response(serializer.errors, status=400)
+        
 
 class CompetitionsViewSet(ModelViewSet):
     queryset = Competitions.objects.all()
