@@ -23,6 +23,8 @@ router.register(r'fotos', FotosViewSet)
 router.register(r'videos', VideosViewSet)
 router.register(r'categorydocs', CategoryDocsViewSet)
 router.register(r'docs',DocsViewSet)
+router.register(r'news', NewsViewSet)
+# router.register(r'newsimages', )
 
 
 urlpatterns = [

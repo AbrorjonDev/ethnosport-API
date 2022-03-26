@@ -148,7 +148,16 @@ class CategorySerializer(serializers.HyperlinkedModelSerializer, serializers.Mod
         }
 
 
+class SportsmenImagesForOtherSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SportsmenImages
+        fields = ('url', 'pk', 'image',)
+        extra_kwargs = {
+            'url':{'view_name':'app:sportsmenimages-detail', 'lookup_field':'pk'}
+        }
+
 class SportsmenSerializer(serializers.ModelSerializer):
+    sportsman_images = SportsmenImagesForOtherSerializer(required=False, many=True)
     # images = serializers.ImageField(required=False)
     class Meta:
         model = Sportsmen
@@ -164,7 +173,7 @@ class SportsmenListSerializer(serializers.HyperlinkedModelSerializer, serializer
     category = CategorySerializer(required=False, many=True)
     sport = SportsSerializer(required=False, many=False)
     region = RegionForOtherSerializer(required=False)
-
+    main_sportman_image = SportsmenImagesForOtherSerializer(required=False, many=False)
     class Meta:
         model = Sportsmen
         fields = ['url', 'id', 'name', 'date', 'achievements', 'category','sport', 'region', 'main_sportman_image']
@@ -329,3 +338,21 @@ class CategoryDocsSerializer(serializers.ModelSerializer):
 #            'lookup_field':'pk'},
 #        }
 
+class NewsImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsImages
+        fields = ('pk', 'image',)
+
+class NewsSerializer(serializers.ModelSerializer):
+    news_images = NewsImagesSerializer(required=False, many=True, read_only=True)
+    images = serializers.ImageField(required=False)
+    class Meta:
+        model = News
+        fields = ('pk', 'name', 'title', 'news_images', 'images')
+
+        extra_kwargs = {
+            'news_images':{'read_only':True},
+            'images':{'write_only':True}
+        }
+
+    
