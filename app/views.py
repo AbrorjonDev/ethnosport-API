@@ -266,3 +266,16 @@ class DocsViewSet(ModelViewSet):
     serializer_class = DocsSerializer
 
     
+class NewsViewSet(ModelViewSet):
+    queryset = News.objects.all()
+    serializer_class = NewsSerializer
+    
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            instance = News.objects.create(name=serializer.validated_data.get('name'), title=serializer.validated_data.get('title'))
+            
+            for img in request.FILES.getlist('images'):
+                NewsImages.objects.create(news=instance, image=img)
+            return Response({'status':'ok, created'}, status=201)
+        return Response(serializer.errors, status=400)

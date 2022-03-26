@@ -134,7 +134,7 @@ class Sportsmen(models.Model):
 
     @property
     def main_sportman_image(self):
-        return '{0}'.format(self.sportman_image.first().image.url)   
+        return self.sportman_image.first()
     
 
 class SportsmenImages(models.Model):
@@ -268,7 +268,24 @@ class Docs(models.Model):
         return self.name
 
 
+class News(models.Model):
+    name = models.CharField(max_length=1000, null=True, blank=True)
+    title = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
+    @property
+    def news_images(self):
+        return self.images.all()
+
+
+class NewsImages(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='news_images')
+
+    def __str__(self):
+        return f'{self.news.name} {self.id}'
 
 
 

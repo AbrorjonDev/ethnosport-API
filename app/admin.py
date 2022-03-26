@@ -116,3 +116,18 @@ admin.site.register(Fotos)
 admin.site.register(CategoryDocs)
 
 admin.site.register(Docs)
+
+
+class NewsImagesInline(admin.StackedInline):
+    model = NewsImages
+    classes = ('collapse',)
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+    inlines = [NewsImagesInline]
+
+admin.site.register(NewsImages)
