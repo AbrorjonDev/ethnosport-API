@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -79,7 +79,7 @@ class Sports(models.Model):
     slug = models.SlugField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-
+    text = models.TextField(null=True, blank=True)
     def save(self, *args, **kwargs):
         if not self.slug or self.slug !=slugify(self.name):
             self.slug = slugify(self.name)
@@ -187,7 +187,9 @@ class Competitions(models.Model):
     name = models.CharField(max_length=300, verbose_name=_('name'))
     sports = models.ManyToManyField(Sports, default=None, related_name='sports')
     pdf = models.FileField(upload_to='competitions', null=True, blank=True)
-
+    region = models.ForeignKey(RegionModel, on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(upload_to='competitionimages', null=True, blank=True)
+    download_counter = models.IntegerField(default=0)
     def __str__(self) -> str:
         return self.name
 
@@ -211,14 +213,15 @@ class CompetitionImages(models.Model):
     image = models.ImageField(upload_to='images')
 
     def __str__(self):
-        return self.image
+        return f'{self.competition.name} {self.id}'
 
 
 class CommentsINCompetitions(models.Model):
     competition = models.ForeignKey(Competitions, on_delete=models.CASCADE, related_name='comments')
     comment = models.CharField(max_length=3000)
     name = models.CharField(max_length=200, help_text='Who is commenting?')
-    rate = models.FloatField(default=0.0)
+#    rate = models.FloatField(default=0.0)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
         ordering = ('-pk',)
@@ -228,12 +231,14 @@ class CommentsINCompetitions(models.Model):
 
 class Videos(models.Model):
     name = models.CharField(max_length=1000, null=True, blank=True)
-    video = models.FileField(upload_to='videos')
+    video = models.FileField(upload_to='videos', null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
     def __str__(self):
         return self.name
 
     def save(self, *args,**kwargs):
-        
+        if not self.video and not self.url:
+            raise ValidationError('Kamida bitta sohani to\'ldiring: (\'video\', \'url\')')
         if not self.name:
             self.name = self.video.name
         return super(Videos, self).save(*args,**kwargs)
@@ -284,14 +289,19 @@ class Docs(models.Model):
 class News(models.Model):
     name = models.CharField(max_length=1000, null=True, blank=True)
     title = models.TextField(null=True, blank=True)
-
+    date_added = models.DateTimeField(null=True, blank=True)
+    date_updated = models.DateTimeField(null=True, blank=True)
+    #image = models.ImageField(upload_to='newsimages', null=True, blank=True)
     def __str__(self):
         return self.name
 
     @property
     def news_images(self):
         return self.images.all()
-
+    @property
+    def main_image(self):
+        if self.images.all().count():
+            return self.images.first()
 
 class NewsImages(models.Model):
     news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='images')

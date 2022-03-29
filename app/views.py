@@ -51,8 +51,9 @@ class SportsViewSet(ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             # serializer.save()
             sport = serializer.validated_data.get('sport')
+            text = serializer.validated_data.get('text')
             try:
-                sport_obj = Sports.objects.create(name=sport)
+                sport_obj = Sports.objects.create(name=sport, text=text)
             except Exception as e:
                 raise e
             try:
@@ -235,19 +236,20 @@ class CompetitionsViewSet(ModelViewSet):
     def create(self, request):
         serializer = CompetitionsSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            data = serializer.validated_data
-            name, sports = data['name'], data['sports']
-            pdf = data['pdf']
-            
-            competition_obj = Competitions.objects.create(
-                name=name, pdf=pdf
-                )
-            competition_obj.sports.set(sports)
-            competition_obj.save()
+            serializer.save()
+#            data = serializer.validated_data
+#            name, sports = data['name'], data['sports']
+#            pdf = data['pdf']
 
-            images = request.FILES.getlist('images')
-            for img in images:
-                CompetitionImages.objects.create(competition=competition_obj, image=img)
+#            competition_obj = Competitions.objects.create(
+#                name=name, pdf=pdf
+#                )
+#            competition_obj.sports.set(sports)
+#            competition_obj.save()
+
+#            images = request.FILES.getlist('images')
+#            for img in images:
+#                CompetitionImages.objects.create(competition=competition_obj, image=img)
             # data = SportsmenSerializer(sportsman_obj, many=False).data
             return Response({'status':'created'}, status=200)
         return Response(serializer.errors, status=400)
@@ -261,7 +263,7 @@ class CompetitionImagesViewSet(ModelViewSet):
 class CommentsINCompetitionsViewSet(ModelViewSet):
     queryset = CommentsINCompetitions.objects.all()
     serializer_class = CommentsINCompetitionsSerializer
-
+    permission_classes = (AllowAny, )
     
 
 class VideosViewSet(ModelViewSet):
@@ -294,5 +296,6 @@ class NewsViewSet(ModelViewSet):
             
             for img in request.FILES.getlist('images'):
                 NewsImages.objects.create(news=instance, image=img)
+
             return Response({'status':'ok, created'}, status=201)
         return Response(serializer.errors, status=400)
