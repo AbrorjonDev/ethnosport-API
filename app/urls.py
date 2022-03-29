@@ -25,7 +25,8 @@ router.register(r'categorydocs', CategoryDocsViewSet)
 router.register(r'docs',DocsViewSet)
 router.register(r'news', NewsViewSet)
 # router.register(r'newsimages', )
-
+router.register(r'appeals/get', AppealsReadViewSet)
+router.register(r'appeals/post', AppealsPostViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

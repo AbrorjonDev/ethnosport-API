@@ -143,3 +143,5 @@ class NewsAdmin(admin.ModelAdmin):
     inlines = [NewsImagesInline]
 
 admin.site.register(NewsImages)
+
+admin.site.register(Appeals)

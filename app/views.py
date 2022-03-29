@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 
 from .models import *
 
@@ -299,3 +299,27 @@ class NewsViewSet(ModelViewSet):
 
             return Response({'status':'ok, created'}, status=201)
         return Response(serializer.errors, status=400)
+
+
+class AppealsPostViewSet(ModelViewSet):
+    queryset = Appeals.objects.all()
+    serializer_class = AppealsSerializer
+    permission_classes = (AllowAny, )
+
+    def list(self, request):
+        return Response({'message':'You can post your appeals','message_uz':'Bu yerda o\'z murojaatingizni qoldirishingiz mumkin.'}, status=200)
+
+
+class AppealsReadViewSet(ModelViewSet):
+    """Faqat mutassaddilar bu murojaatlarni ko'ra oladilar"""
+    queryset = Appeals.objects.all()
+    serializer_class = AppealsSerializer
+    permission_classes = (IsAuthenticated, )
+    def get_queryset(self, seen=False, all=False):
+        return Appeals.objects.all()
+
+    def list(self, request):
+        all = request.query_params.get('all', False)
+        seen = request.query_params.get('seen', False)
+        serializer = self.serializer_class(self.get_queryset(seen=seen, all=all), many=True)
+        return Response(serializer.data, status=200)

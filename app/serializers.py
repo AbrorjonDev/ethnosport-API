@@ -364,3 +364,7 @@ class NewsSerializer(serializers.ModelSerializer):
         }
 
     
+class AppealsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appeals
+        fields = "__all__"

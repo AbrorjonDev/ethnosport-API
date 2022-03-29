@@ -312,4 +312,27 @@ class NewsImages(models.Model):
 
 
 
+class Appeals(models.Model):
+    fio = models.CharField(max_length=200)
+    phone = PhoneNumberField(verbose_name=_('Phone'), help_text='+998971661186')
+    text = models.TextField(null=True, blank=True)
+    seen = models.BooleanField(default=False, null=True, blank=True)
+    date_sent = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.fio
 
+    class Meta:
+        verbose_name = 'Murojaat'
+        verbose_name_plural = 'Murojaatlar'
+        ordering = ('-date_sent',)
+
+# from django.dispatch import receiver
+# from django.db.models.signals import pre_save
+
+# @receiver(pre_save, sender=Appeals)
+# def save_objects_as_seen(sender, instance, **kwargs):
+#     if not instance.seen:
+#         instance.seen = True
+
+# pre_save.connect(receiver, save_objects_as_seen, )
