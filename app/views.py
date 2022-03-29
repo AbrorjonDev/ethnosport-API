@@ -314,7 +314,7 @@ class AppealsReadViewSet(ModelViewSet):
     """Faqat mutassaddilar bu murojaatlarni ko'ra oladilar"""
     queryset = Appeals.objects.all()
     serializer_class = AppealsSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
     def get_queryset(self, seen=False, all=False):
         if all:
             return Appeals.objects.all()
