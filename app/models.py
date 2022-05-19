@@ -49,9 +49,7 @@ class RegionModel(models.Model):
         rates = [event.rate for event in self.events.all()]
         for rate in rates:
             ball += rate
- #       print("Ball: ", ball)
-#        print( "max ball: ", float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20))))
-        # return  ball
+
         if self.get_events_count:
             return round(ball/float(self.get_events_count*int(config('MAX_EVENT_BALL', default=20)))*100, 2)
         return 0
@@ -220,7 +218,6 @@ class CommentsINCompetitions(models.Model):
     competition = models.ForeignKey(Competitions, on_delete=models.CASCADE, related_name='comments')
     comment = models.CharField(max_length=3000)
     name = models.CharField(max_length=200, help_text='Who is commenting?')
-#    rate = models.FloatField(default=0.0)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
@@ -326,13 +323,3 @@ class Appeals(models.Model):
         verbose_name = 'Murojaat'
         verbose_name_plural = 'Murojaatlar'
         ordering = ('-date_sent',)
-
-# from django.dispatch import receiver
-# from django.db.models.signals import pre_save
-
-# @receiver(pre_save, sender=Appeals)
-# def save_objects_as_seen(sender, instance, **kwargs):
-#     if not instance.seen:
-#         instance.seen = True
-
-# pre_save.connect(receiver, save_objects_as_seen, )
